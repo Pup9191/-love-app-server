@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel - User Logins</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #fce4ec;
+    }
+    h1 {
+      color: #d81b60;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #ff80ab;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Logged In Users 💌</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Gmail</th>
+        <th>Login Time</th>
+      </tr>
+    </thead>
+    <tbody id="loginTableBody"></tbody>
+  </table>
+
+  <script>
+    fetch('/logins')
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("loginTableBody");
+        data.forEach(user => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${user.name}</td>
+            <td>${user.phone}</td>
+            <td>${user.email}</td>
+            <td>${user.time}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  </script>
+</body>
+</html>
